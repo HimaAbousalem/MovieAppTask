@@ -54,7 +54,10 @@ class MoviesListFragment : Fragment(), OnItemClickListener {
 
         viewModel.moviesData.observe(requireActivity(), Observer {
             if(it.isNotEmpty()) {
+                binding.noConnection.visibility = View.GONE
                 adapter.submitList(it)
+            }else if(it.isEmpty()){
+                binding.noConnection.visibility = View.VISIBLE
             }
         })
 

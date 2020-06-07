@@ -38,8 +38,9 @@ class BoundaryCallback @Inject constructor(
         isRequestInProgress = true
         CoroutineScope(Dispatchers.IO).launch{
             isRequestInProgress = try {
-                val movieResponse = movieApi.getMovies(pageNum = lastRequestedPage++)
+                val movieResponse = movieApi.getMovies(pageNum = lastRequestedPage)
                 movieDao.insertAll(movieResponse.results)
+                lastRequestedPage++
                 false
             }catch (e:Exception){
                 _networkErrors.postValue("No Internet Connection")
