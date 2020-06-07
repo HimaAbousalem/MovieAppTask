@@ -20,6 +20,10 @@ class BoundaryCallback @Inject constructor(
     private var lastRequestedPage = 1
     private var isRequestInProgress = false
 
+    private val _networkErrors = MutableLiveData<String>()
+    val networkErrors: LiveData<String>
+        get() = _networkErrors
+
     override fun onZeroItemsLoaded() {
         requestAndSaveData()
     }
@@ -27,15 +31,20 @@ class BoundaryCallback @Inject constructor(
     override fun onItemAtEndLoaded(itemAtEnd: Movie) {
         requestAndSaveData()
     }
-//TODO: Check connectivity
+
     private fun requestAndSaveData() {
         if (isRequestInProgress) return
 
         isRequestInProgress = true
         CoroutineScope(Dispatchers.IO).launch{
-            val movieResponse = movieApi.getMovies(pageNum = lastRequestedPage++)
-            movieDao.insertAll(movieResponse.results)
-            isRequestInProgress = false
+            isRequestInProgress = try {
+                val movieResponse = movieApi.getMovies(pageNum = lastRequestedPage++)
+                movieDao.insertAll(movieResponse.results)
+                false
+            }catch (e:Exception){
+                _networkErrors.postValue("No Internet Connection")
+                false
+            }
         }
     }
 }

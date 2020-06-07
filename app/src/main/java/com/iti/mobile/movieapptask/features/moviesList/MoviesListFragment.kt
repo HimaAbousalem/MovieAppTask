@@ -1,10 +1,12 @@
 package com.iti.mobile.movieapptask.features.moviesList
 
+import android.opengl.Visibility
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
@@ -13,9 +15,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.iti.mobile.movieapptask.R
 import com.iti.mobile.movieapptask.dagger.modules.controller.ControllerModule
 import com.iti.mobile.movieapptask.databinding.FragmentMoviesListBinding
+import com.iti.mobile.movieapptask.extension.toast
 import com.iti.mobile.movieapptask.features.base.MovieApplication
 import com.iti.mobile.movieapptask.features.base.ViewModelProviderFactory
 import com.iti.mobile.movieapptask.model.entities.Movie
+import kotlinx.android.synthetic.main.fragment_movies_list.*
 import javax.inject.Inject
 
 class MoviesListFragment : Fragment(), OnItemClickListener {
@@ -49,8 +53,13 @@ class MoviesListFragment : Fragment(), OnItemClickListener {
         }
 
         viewModel.moviesData.observe(requireActivity(), Observer {
-            if(it.isNotEmpty())
+            if(it.isNotEmpty()) {
                 adapter.submitList(it)
+            }
+        })
+
+        viewModel.networkErrors.observe(requireActivity(), Observer {
+            context?.toast(it)
         })
     }
 
